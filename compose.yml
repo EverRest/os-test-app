@@ -1,0 +1,46 @@
+version: "3.8"
+services:
+  app:
+    container_name: app
+    restart: unless-stopped
+    tty: true
+    build: .
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - test-app-network
+  webserver:
+    image: nginx:alpine
+    container_name: webserver
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./:/var/www
+      - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+    networks:
+      - test-app-network
+  db:
+    image: postgres:latest
+    container_name: db
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "5432:5432"                                                                "
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    networks:
+      - test-app-network
+networks:
+  test-app-network:
+    driver: bridge
+volumes:
+  dbdata:
+    driver: local
