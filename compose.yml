@@ -1,19 +1,21 @@
 version: "3.8"
 services:
   app:
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: app
-    restart: unless-stopped
-    tty: true
-    build: .
-    working_dir: /var/www
+    ports:
+      - '3000:3000'
+    depends_on:
+      - db
     volumes:
-      - ./:/var/www
-      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+      - ./src:/default.conf/src
     networks:
-      - test-app-network
-  webserver:
+    - network-test
+  nginx:
     image: nginx:alpine
-    container_name: webserver
+    container_name: nginx
     restart: unless-stopped
     tty: true
     ports:
@@ -21,26 +23,44 @@ services:
       - "443:443"
     volumes:
       - ./:/var/www
-      - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+      - ./docker/nginx/:/etc/nginx/conf.d/
     networks:
-      - test-app-network
+      - network-test
   db:
-    image: postgres:latest
+    image: postgres
     container_name: db
     restart: unless-stopped
+    user: postgres
     tty: true
     ports:
-      - "5432:5432"                                                                "
+      - "5432:5432"
     environment:
-      MYSQL_DATABASE: ${DB_DATABASE}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
     volumes:
-      - dbdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
     networks:
-      - test-app-network
+      - network-test
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    container_name: nest-pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    volumes:
+      - pgadmindata:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    networks:
+      - network-test
 networks:
-  test-app-network:
+  network-test:
     driver: bridge
 volumes:
-  dbdata:
+  pgdata:
+    driver: local
+  pgadmindata:
     driver: local
