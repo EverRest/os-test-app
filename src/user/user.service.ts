@@ -10,10 +10,10 @@ export class UserService {
   createUser(): string {
     return 'createUser';
   }
-  updateUser(): string {
-    return 'updateUser';
+  updateUser(id: string): string {
+    return 'updateUser ' + id;
   }
-  deleteUser(): string {
-    return 'deleteUser';
+  deleteUser(id: string): string {
+    return 'deleteUser ' + id;
   }
 }
