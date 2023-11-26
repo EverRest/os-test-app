@@ -14,6 +14,12 @@ export class CreateUsersTable implements MigrationInterface {
             generationStrategy: 'increment',
           },
           {
+            name: 'name',
+            type: 'varchar',
+            isUnique: true,
+            length: '255',
+          },
+          {
             name: 'email',
             type: 'varchar',
             isUnique: true,
@@ -23,28 +29,6 @@ export class CreateUsersTable implements MigrationInterface {
             name: 'password',
             type: 'varchar',
             length: '255',
-          },
-          {
-            name: 'name',
-            type: 'varchar',
-            length: '255',
-          },
-          {
-            name: 'token',
-            type: 'varchar',
-            length: '255',
-            isNullable: true,
-          },
-          {
-            name: 'created_at',
-            type: 'timestamp',
-            default: 'CURRENT_TIMESTAMP',
-          },
-          {
-            name: 'updated_at',
-            type: 'timestamp',
-            default: 'CURRENT_TIMESTAMP',
-            onUpdate: 'CURRENT_TIMESTAMP',
           },
         ],
       }),
